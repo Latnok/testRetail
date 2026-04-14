@@ -1,0 +1,52 @@
+[
+  {
+    "firstName": "Cycle",
+    "lastName": "MegaHigh",
+    "phone": "+79990002001",
+    "email": "cycle-megahigh@example.com",
+    "orderType": "eshop-individual",
+    "orderMethod": "shopping-cart",
+    "status": "new",
+    "items": [
+      {
+        "productName": "Full Cycle Test Mega High",
+        "quantity": 1,
+        "initialPrice": 205000
+      }
+    ],
+    "delivery": {
+      "address": {
+        "city": "Almaty",
+        "text": "Full cycle mega high"
+      }
+    },
+    "customFields": {
+      "utm_source": "full-cycle-high"
+    }
+  },
+  {
+    "firstName": "Cycle",
+    "lastName": "Low",
+    "phone": "+79990002002",
+    "email": "cycle-low@example.com",
+    "orderType": "eshop-individual",
+    "orderMethod": "shopping-cart",
+    "status": "new",
+    "items": [
+      {
+        "productName": "Full Cycle Test Low",
+        "quantity": 1,
+        "initialPrice": 21000
+      }
+    ],
+    "delivery": {
+      "address": {
+        "city": "Almaty",
+        "text": "Full cycle low"
+      }
+    },
+    "customFields": {
+      "utm_source": "full-cycle-low"
+    }
+  }
+]
