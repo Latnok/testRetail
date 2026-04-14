@@ -79,7 +79,43 @@ function mapRetailOrderToDb(order) {
   };
 }
 
-function formatTelegramMessage(order) {
+function buildRetailCrmOrderUrl(baseUrl, orderId) {
+  if (!baseUrl || !orderId) {
+    return null;
+  }
+
+  return `${String(baseUrl).replace(/\/+$/, "")}/orders/${orderId}/edit`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function formatTelegramDateTime(value) {
+  if (!value) {
+    return "n/a";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(date);
+}
+
+function formatTelegramMessage(order, options = {}) {
+  const retailCrmBaseUrl = options.retailCrmBaseUrl || null;
   const isDbRow = Object.prototype.hasOwnProperty.call(order, "retailcrm_order_id");
   const totalAmount = isDbRow
     ? Number(order.total_amount || 0)
@@ -95,22 +131,69 @@ function formatTelegramMessage(order) {
   const city = isDbRow ? order.city : order.delivery?.address?.city || "n/a";
   const status = isDbRow ? order.status : order.status || "n/a";
   const createdAt = isDbRow ? order.created_at : order.createdAt || "n/a";
+  const orderId = isDbRow ? order.retailcrm_order_id : order.id || order.externalId || null;
+  const orderUrl = buildRetailCrmOrderUrl(retailCrmBaseUrl, orderId);
+  const orderLabel = escapeHtml(`Order #${orderNumber}`);
 
   return [
-    `New large order`,
-    `Order: https://latnok.retailcrm.ru/orders/${parseInt(orderNumber)}/edit`,
-    `Amount: ${totalAmount}`,
-    `Customer: ${customerName || "n/a"}`,
-    `Phone: ${phone || "n/a"}`,
-    `City: ${city || "n/a"}`,
-    `Status: ${status || "n/a"}`,
-    `Created: ${createdAt || "n/a"}`
+    `<b>New large order</b>`,
+    `Order: ${orderUrl ? `<a href="${escapeHtml(orderUrl)}">${orderLabel}</a>` : orderLabel}`,
+    `Amount: <b>${escapeHtml(totalAmount)}</b>`,
+    `Customer: ${escapeHtml(customerName || "n/a")}`,
+    `Phone: ${escapeHtml(phone || "n/a")}`,
+    `City: ${escapeHtml(city || "n/a")}`,
+    `Status: ${escapeHtml(status || "n/a")}`,
+    `Created: ${escapeHtml(formatTelegramDateTime(createdAt || "n/a"))}`
   ].join("\n");
+}
+
+function formatTelegramBatchMessage(orders, options = {}) {
+  const retailCrmBaseUrl = options.retailCrmBaseUrl || null;
+
+  if (!orders.length) {
+    return "New large orders: 0";
+  }
+
+  if (orders.length === 1) {
+    return formatTelegramMessage(orders[0], options);
+  }
+
+  const totalAmount = orders.reduce(
+    (sum, order) => sum + Number(order.total_amount || order.totalAmount || 0),
+    0
+  );
+
+  const lines = [
+    `<b>New large orders: ${orders.length}</b>`,
+    `Total amount: <b>${escapeHtml(totalAmount)}</b>`,
+    ""
+  ];
+
+  for (const order of orders) {
+    const orderNumber = order.retailcrm_order_number || order.retailcrm_order_id || "n/a";
+    const customerName = [order.first_name, order.last_name]
+      .filter(Boolean)
+      .join(" ");
+    const orderUrl =
+      buildRetailCrmOrderUrl(retailCrmBaseUrl, order.retailcrm_order_id) ||
+      `#${orderNumber}`;
+    const createdAt = formatTelegramDateTime(order.created_at || order.createdAt || "n/a");
+
+    lines.push(
+      `${orderUrl ? `<a href="${escapeHtml(orderUrl)}">${escapeHtml(`Order #${orderNumber}`)}</a>` : escapeHtml(`Order #${orderNumber}`)} | ${escapeHtml(Number(order.total_amount || 0))} | ${escapeHtml(customerName || "n/a")} | ${escapeHtml(order.city || "n/a")} | ${escapeHtml(order.status || "n/a")} | ${escapeHtml(createdAt)}`
+    );
+  }
+
+  return lines.join("\n");
 }
 
 module.exports = {
   calculateOrderTotal,
   toRetailCrmOrderPayload,
   mapRetailOrderToDb,
-  formatTelegramMessage
+  formatTelegramMessage,
+  formatTelegramBatchMessage,
+  buildRetailCrmOrderUrl,
+  escapeHtml,
+  formatTelegramDateTime
 };

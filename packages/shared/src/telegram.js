@@ -4,7 +4,7 @@ class TelegramClient {
     this.fetchImpl = fetchImpl;
   }
 
-  async sendMessage(chatId, text) {
+  async sendMessage(chatId, text, options = {}) {
     const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
     const response = await this.fetchImpl(url, {
       method: "POST",
@@ -13,7 +13,12 @@ class TelegramClient {
       },
       body: JSON.stringify({
         chat_id: chatId,
-        text
+        text,
+        parse_mode: options.parseMode || undefined,
+        disable_web_page_preview:
+          options.disableWebPagePreview === undefined
+            ? true
+            : Boolean(options.disableWebPagePreview)
       })
     });
 

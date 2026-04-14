@@ -5,7 +5,7 @@ const {
   hasNotification,
   logNotification,
   listRecentOrdersForNotifications,
-  formatTelegramMessage
+  formatTelegramBatchMessage
 } = require("@testretail/shared");
 
 function getWindow(minutes, overlapMinutes = 1) {
@@ -30,8 +30,10 @@ async function pollOnce({ telegramClient, supabase, config }) {
     config.telegramOrderThreshold
   );
 
-  for (const order of orders) {
-    for (const chatId of config.telegramChatIds) {
+  for (const chatId of config.telegramChatIds) {
+    const pendingOrders = [];
+
+    for (const order of orders) {
       const retailcrmOrderId = String(order.retailcrm_order_id);
       const alreadySent = await hasNotification(
         supabase,
@@ -44,25 +46,48 @@ async function pollOnce({ telegramClient, supabase, config }) {
         continue;
       }
 
-      try {
-        const payload = await telegramClient.sendMessage(
-          chatId,
-          formatTelegramMessage(order)
-        );
+      pendingOrders.push(order);
+    }
 
+    if (!pendingOrders.length) {
+      continue;
+    }
+
+    try {
+      const payload = await telegramClient.sendMessage(
+        chatId,
+        formatTelegramBatchMessage(pendingOrders, {
+          retailCrmBaseUrl: config.retailCrmBaseUrl
+        }),
+        {
+          parseMode: "HTML",
+          disableWebPagePreview: true
+        }
+      );
+
+      const notifiedAt = new Date().toISOString();
+
+      for (const order of pendingOrders) {
+        const retailcrmOrderId = String(order.retailcrm_order_id);
         await logNotification(supabase, {
           retailcrm_order_id: retailcrmOrderId,
           chat_id: chatId,
           threshold_value: config.telegramOrderThreshold,
           message_status: "sent",
-          notified_at: new Date().toISOString(),
+          notified_at: notifiedAt,
           payload
         });
+      }
 
-        console.log(
-          `[NOTIFIED] order ${retailcrmOrderId} sent to chat ${chatId}`
-        );
-      } catch (error) {
+      console.log(
+        `[NOTIFIED] ${pendingOrders.length} order(s) sent to chat ${chatId}: ${pendingOrders
+          .map((order) => order.retailcrm_order_id)
+          .join(", ")}`
+      );
+    } catch (error) {
+      for (const order of pendingOrders) {
+        const retailcrmOrderId = String(order.retailcrm_order_id);
+
         await logNotification(supabase, {
           retailcrm_order_id: retailcrmOrderId,
           chat_id: chatId,
@@ -71,11 +96,11 @@ async function pollOnce({ telegramClient, supabase, config }) {
           notified_at: new Date().toISOString(),
           payload: { error: error.message }
         });
-
-        console.error(
-          `[ERROR] failed to notify chat ${chatId} for order ${retailcrmOrderId}: ${error.message}`
-        );
       }
+
+      console.error(
+        `[ERROR] failed to notify chat ${chatId} for ${pendingOrders.length} order(s): ${error.message}`
+      );
     }
   }
 }

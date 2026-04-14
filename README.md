@@ -57,14 +57,4 @@ npm run telegram:watch
 
 The Telegram watcher reads only newly synced orders from Supabase by `synced_at`.
 
-## Recommended `.env` values
-
-```env
-RETAIL_CRM_SITE=latnok
-TELEGRAM_CHAT_IDS=130884732
-TELEGRAM_ORDER_THRESHOLD=50000
-SUPABASE_SYNC_INTERVAL_MINUTES=10
-ORDER_POLL_INTERVAL_MINUTES=5
-```
-
 More details are in [docs/setup.md](/C:/Users/latno/Documents/testRetail/docs/setup.md).

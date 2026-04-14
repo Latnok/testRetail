@@ -20,16 +20,6 @@ Use the root `.env` and set:
 `TELEGRAM_CHAT_IDS` is a comma-separated list.
 If `RETAIL_CRM_SITE` is empty and the API key sees exactly one site, the importer auto-detects it.
 
-Recommended runtime values for this project:
-
-```env
-RETAIL_CRM_SITE=latnok
-TELEGRAM_CHAT_IDS=130884732
-TELEGRAM_ORDER_THRESHOLD=50000
-SUPABASE_SYNC_INTERVAL_MINUTES=10
-ORDER_POLL_INTERVAL_MINUTES=5
-```
-
 ## 2. Install dependencies
 
 ```bash
