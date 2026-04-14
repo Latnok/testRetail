@@ -1,0 +1,12 @@
+{
+  "name": "@testretail/telegram-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "telegram:watch": "node index.js"
+  },
+  "dependencies": {
+    "@testretail/shared": "1.0.0"
+  }
+}

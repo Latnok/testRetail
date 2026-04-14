@@ -1,0 +1,52 @@
+[
+  {
+    "firstName": "E2E",
+    "lastName": "High",
+    "phone": "+79990001001",
+    "email": "e2e-high@example.com",
+    "orderType": "eshop-individual",
+    "orderMethod": "shopping-cart",
+    "status": "new",
+    "items": [
+      {
+        "productName": "Cycle Test High",
+        "quantity": 1,
+        "initialPrice": 65000
+      }
+    ],
+    "delivery": {
+      "address": {
+        "city": "Almaty",
+        "text": "Test high order"
+      }
+    },
+    "customFields": {
+      "utm_source": "e2e-cycle-high"
+    }
+  },
+  {
+    "firstName": "E2E",
+    "lastName": "Low",
+    "phone": "+79990001002",
+    "email": "e2e-low@example.com",
+    "orderType": "eshop-individual",
+    "orderMethod": "shopping-cart",
+    "status": "new",
+    "items": [
+      {
+        "productName": "Cycle Test Low",
+        "quantity": 1,
+        "initialPrice": 25000
+      }
+    ],
+    "delivery": {
+      "address": {
+        "city": "Almaty",
+        "text": "Test low order"
+      }
+    },
+    "customFields": {
+      "utm_source": "e2e-cycle-low"
+    }
+  }
+]

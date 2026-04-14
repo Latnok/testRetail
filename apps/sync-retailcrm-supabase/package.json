@@ -1,0 +1,12 @@
+{
+  "name": "@testretail/sync-retailcrm-supabase",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "sync:supabase": "node index.js"
+  },
+  "dependencies": {
+    "@testretail/shared": "1.0.0"
+  }
+}

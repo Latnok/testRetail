@@ -1,0 +1,12 @@
+{
+  "name": "@testretail/ingest-retailcrm",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "import:retailcrm": "node index.js"
+  },
+  "dependencies": {
+    "@testretail/shared": "1.0.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "testretail-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "RetailCRM -> Supabase -> Dashboard -> Telegram monorepo on Node.js",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "import:retailcrm": "npm run import:retailcrm --workspace @testretail/ingest-retailcrm --",
+    "sync:supabase": "npm run sync:supabase --workspace @testretail/sync-retailcrm-supabase --",
+    "sync:supabase:watch": "npm run sync:supabase --workspace @testretail/sync-retailcrm-supabase -- --watch",
+    "telegram:watch": "npm run telegram:watch --workspace @testretail/telegram-bot --",
+    "dashboard:dev": "npm run dev --workspace @testretail/dashboard",
+    "dashboard:build": "npm run build --workspace @testretail/dashboard",
+    "check:env": "node packages/shared/src/check-env.js"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  }
+}
